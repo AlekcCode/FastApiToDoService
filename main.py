@@ -16,9 +16,9 @@ class STask(STaskAdd):
 
 
 tasks = []
+
+
 @app.post('/tasks')
-async def add_tasks(
-        task: Annotated[STaskAdd, Depends()],
-):
+async def add_tasks(task: Annotated[STaskAdd, Depends()],):
     tasks.append(task)
-    return {'status': 'Ok'}
+    return {'status': True}
