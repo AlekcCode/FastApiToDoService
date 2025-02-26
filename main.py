@@ -1,24 +1,16 @@
-from typing import Optional, Annotated
-
-from fastapi import FastAPI, Depends
-from pydantic import BaseModel
-
-app = FastAPI()
+from fastapi import FastAPI
+from router import router
+from database import create_database, delete_database
+from contextlib import asynccontextmanager
 
 
-class STaskAdd(BaseModel):
-    name: str
-    description: Optional[str] = None
-
-
-class STask(STaskAdd):
-    id: int
-
-
-tasks = []
-
-
-@app.post('/tasks')
-async def add_tasks(task: Annotated[STaskAdd, Depends()],):
-    tasks.append(task)
-    return {'status': True}
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await delete_database()
+    print('Очистка')
+    await create_database()
+    print('БД готова к работе')
+    yield
+    print('Выключение')
+app = FastAPI(lifespan=lifespan)
+app.include_router(router)
